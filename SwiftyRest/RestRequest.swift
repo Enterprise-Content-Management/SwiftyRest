@@ -1,0 +1,306 @@
+//
+//  RestRequest.swift
+//  SwiftyRest
+//
+//  Created by Song, Michyo on 11/24/16.
+//  Copyright © 2016 Song, Michyo. All rights reserved.
+//
+
+import Alamofire
+import SwiftyJSON
+
+class RestRequest: ServiceHelper {
+    // MARK: - Basic request
+    
+    private func sendRequest(
+        method: Alamofire.Method,
+        url: String,
+        params: Dictionary<String, AnyObject>? = nil,
+        headers: [String: String]? = nil,
+        encoding: ParameterEncoding = .URL,
+        onSuccess: (JSON) -> (),
+        onFailure: (JSON) -> ()
+        ) {
+        Alamofire.request(method, url, parameters: params, headers: headers, encoding: encoding)
+            .validate()
+            .responseJSON { response in
+                switch response.result {
+                case .Success:
+                    printLog("Success request to \(url)")
+                    if let value = response.result.value {
+                        let json = JSON(value)
+                        onSuccess(json)
+                    }
+                case .Failure:
+                    let json = JSON(data: response.data!)
+                    printError("error: \(json)")
+                    onFailure(json)
+                }
+        }
+    }
+
+    // MARK: - Entity Collection request
+    
+    private func getEntriesOnSuccess(json: JSON, completionHandler: (NSArray?, Error?) -> ()) {
+        let dictionary = json.object as! Dictionary<String, AnyObject>
+        let array = dictionary[ServiceConstants.ENTRIES] as? NSArray
+        completionHandler(array, nil)
+    }
+    
+    private func processFailureJson(json: JSON, completionHandler: (NSArray?, Error?) -> ()) {
+        let error = Error(json: json)
+        completionHandler(nil, error)
+    }
+    
+    func getResponseWithParams(url: String, params: [String: String], completionHandler: (NSArray?, Error?) -> ()) {
+        sendRequest(.GET, url: url, params: params,
+                    onSuccess: { json in
+                        self.getEntriesOnSuccess(json, completionHandler: completionHandler)
+            },
+                    onFailure: { json in
+                        self.processFailureJson(json, completionHandler: completionHandler)
+        })
+    }
+    
+    func getResponseWithAuthAndParam(url: String, params: [String : String], completionHandler: (NSArray?, Error?) -> ()) {
+        sendRequest(.GET, url: url, params: params, headers: setPreAuth(),
+                    onSuccess: { json in
+                        self.getEntriesOnSuccess(json, completionHandler: completionHandler)
+            },
+                    onFailure: { json in
+                        self.processFailureJson(json, completionHandler: completionHandler)
+        })
+    }
+    
+    // MARK: - Single Entity request
+    
+    private func getEntityOnSuccess(json: JSON, completionHandler: (NSDictionary?, Error?) -> ()) {
+        let dictionary = json.object as! Dictionary<String, AnyObject>
+        completionHandler(dictionary, nil)
+    }
+    
+    private func processFailureJson(json: JSON, completionHandler: (NSDictionary?, Error?) -> ()) {
+        let error = Error(json: json)
+        completionHandler(nil, error)
+    }
+    
+    func getRestObject(url: String, completionHandler: (NSDictionary?, Error?) -> ()) {
+        sendRequest(.GET, url: url, headers: self.setPreAuth(),
+                    onSuccess: { json in
+                        self.getEntityOnSuccess(json, completionHandler: completionHandler)
+            },
+                    onFailure: { json in
+                        self.processFailureJson(json, completionHandler: completionHandler)
+        })
+    }
+    
+    // MARK: - CRUD control requests
+    
+    func deleteWithAuth(url: String, completionHandler: (NSDictionary?, Error?) -> ()) {
+        sendRequest(.DELETE, url: url, headers: self.setPreAuth(),
+                    onSuccess: { json in
+                        self.getEntityOnSuccess(json, completionHandler: completionHandler)
+            },
+                    onFailure: { json in
+                        self.processFailureJson(json, completionHandler: completionHandler)
+        })
+    }
+    
+    func updateWithAuth(url: String, requestBody: Dictionary<String, AnyObject>, completionHandler: (NSDictionary?, Error?) -> ()) {
+        sendRequest(.POST, url: url, headers: getPostRequestHeaders(), params: requestBody, encoding: .JSON,
+                    onSuccess:{ json in
+                        self.getEntityOnSuccess(json,  completionHandler: completionHandler)
+            },
+                    onFailure: { json in
+                        self.processFailureJson(json, completionHandler: completionHandler)
+        })
+    }
+    
+    func createWithAuth(url: String, requestBody: Dictionary<String, AnyObject>, completionHandler: (NSDictionary?, Error?) -> ()) {
+        sendRequest(.POST, url: url, headers: self.getPostRequestHeaders(), params: requestBody, encoding: .JSON,
+                    onSuccess: { json in
+                        self.getEntityOnSuccess(json, completionHandler: completionHandler)
+            },
+                    onFailure: { json in
+                        self.processFailureJson(json, completionHandler: completionHandler)
+        })
+    }
+    
+    internal func getRepositoriesUrlOnSuccess(json: JSON, completionHandler: (String?, Error?) -> ()) {
+        let resources = json["resources"].dictionary!
+        let repositories = resources[LinkRel.repositories.rawValue]?.dictionary
+        let url = repositories!["href"]?.stringValue
+        let about = resources["about"]?.dictionary
+        Context.productInfoUrl = about!["href"]?.stringValue
+        completionHandler(url, nil)
+    }
+    
+    internal func processFailureJson(json: JSON, completionHandler: (String?, Error?) -> ()) {
+        let error = Error(json: json)
+        completionHandler(nil, error)
+    }
+    
+    internal func getRepositoriesUrl(rootUrl: String, serviceContext: String, completionHandler: (String?, Error?) -> ()) {
+        sendRequest(.GET, url: UriBuilder.getServicesUrl(rootUrl, serviceContext: serviceContext),
+                    onSuccess: { json in
+                        self.getRepositoriesUrlOnSuccess(json, completionHandler: completionHandler)
+            }, onFailure: { json in
+                self.processFailureJson(json, completionHandler: completionHandler)
+        })
+    }
+    
+    // MARK: - Upload and Downlad files
+    func uploadFile(
+        url: String,
+        metadata: JSON,
+        file: NSData,
+        type: String,
+        completionHandler: (NSDictionary?, Error?) -> ()
+        ) {
+        Alamofire.upload(
+            .POST, url, headers: self.getUploadRequestHeaders(),
+            multipartFormData: { multipartFormData in
+                multipartFormData.appendBodyPart(
+                    data: self.getNSDataFromJSON(metadata),
+                    name: "metadata",
+                    mimeType: ServiceConstants.MIME_JSON
+                )
+                multipartFormData.appendBodyPart(
+                    data: file, name: "binary",
+                    mimeType: type
+                )
+            },
+            encodingCompletion: { encodingResult in
+                switch encodingResult {
+                case .Success(let upload, _, _):
+                    upload.validate()
+                    upload.responseJSON  { response in
+                        switch response.result {
+                        case .Success:
+                            let value = response.result.value!
+                            let json = JSON(value)
+                            let dic = json.object as! Dictionary<String, AnyObject>
+                            completionHandler(dic, nil)
+                        case .Failure:
+                            let json = JSON(data: response.data!)
+                            printError("error: \(json)")
+                            completionHandler(nil, Error(json: json))
+                        }
+                    }
+                case .Failure(let encodingError):
+                    print(encodingError)
+                }
+        })
+    }
+    
+    func downloadFile(
+        url: String,
+        objectId: String,
+        completionHandler: (NSData?, Error?) -> ()
+        ) {
+        var fileUrl: NSURL?
+        Alamofire.download(
+            .GET, url,
+            headers: self.getDownloadRequestHeaders()
+        ) { temporaryUrl, response in
+            fileUrl = FileUtility.getSaveToUrl(objectId)
+            FileUtility.deleteFile(objectId)
+            
+            printLog("Download path: \(fileUrl!.absoluteString)")
+            return fileUrl!
+            }
+            .response { request, response, data, error in
+                if let error = error {
+                    let userInfo = error.userInfo as [NSObject: AnyObject]
+                    let url = userInfo["NSErrorFailingURLStringKey"] as! String
+                    let parts = url.characters.split("/").map(String.init)
+                    let hostname = parts[1].characters.split(":").map(String.init)[0]
+                    let e = Error(msg: "A server with the specified hostname '\(hostname)' could not be recognizable by this device.")
+                    printError("Failed with error:\(error).")
+                    completionHandler(nil, e)
+                } else {
+                    printLog("Downloaded file successfully.")
+                    completionHandler(NSData(contentsOfURL: fileUrl!), nil)
+                }
+        }
+    }
+    
+    // MARK: - Misc control
+    func moveObject(
+        url: String,
+        requestBody: Dictionary<String, AnyObject>,
+        completionHandler: (NSDictionary?, Error?) -> ()) {
+        Alamofire.request(.PUT, url, parameters: requestBody, headers: self.getPostRequestHeaders(), encoding: .JSON)
+            .validate()
+            .responseJSON { response in
+                switch response.result {
+                case .Success:
+                    printLog("Success move to \(url).")
+                    let json = JSON(response.result.value!)
+                    completionHandler(json.object as? NSDictionary, nil)
+                case .Failure:
+                    let json = JSON(data: response.data!)
+                    printError("error: \(json)")
+                    let error = Error(json: json)
+                    completionHandler(nil, error)
+                }
+        }
+    }
+    
+    // MARK: - Response with no content
+    private func sendRequestForResponse(
+        method: Alamofire.Method,
+        url: String,
+        params: Dictionary<String, AnyObject>? = nil,
+        headers: [String: String]? = nil,
+        encoding: ParameterEncoding = .URL,
+        onResponse: (String) -> ()
+        ) {
+        Alamofire.request(method, url, parameters: params, headers: headers, encoding: encoding)
+            .validate()
+            .response { request, response, data, error in
+                let statusCode = response!.statusCode as Int
+                let result: String!
+                if error != nil {
+                    let json = JSON(data: data!)
+                    printError("error: \(json)")
+                    let e = json.object as! NSDictionary
+                    result = e["message"] as! String
+                } else {
+                    printLog("Success request to \(url) with status code \(statusCode)")
+                    result = "Success"
+                }
+                onResponse(result)
+        }
+    }
+    
+    func addMembership(
+        url: String,
+        requestBody: Dictionary<String, AnyObject>,
+        completionHandler: (String?, Error?) -> ()) {
+        sendRequestForResponse(.POST, url: url, params: requestBody, headers: self.getPostRequestHeaders(), encoding: .JSON) { result in
+            if result == "Success" {
+                completionHandler("Success", nil)
+            } else {
+                completionHandler(nil, Error(msg: result))
+            }
+        }
+    }
+    
+    // MARK: - Helper
+    
+    private func getNSDataFromNSDictionary(dic: NSDictionary) -> NSData {
+        let data = NSKeyedArchiver.archivedDataWithRootObject(dic)
+        return data
+    }
+    
+    private func getNSDataFromJSON(json: JSON) -> NSData {
+        let data: NSData?
+        do {
+            data = try json.rawData()
+        } catch _ {
+            data = nil
+        }
+        return data!
+    }
+}

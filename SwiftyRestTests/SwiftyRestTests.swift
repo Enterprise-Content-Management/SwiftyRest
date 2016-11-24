@@ -7,7 +7,6 @@
 //
 
 import XCTest
-@testable import SwiftyRest
 
 class SwiftyRestTests: XCTestCase {
     

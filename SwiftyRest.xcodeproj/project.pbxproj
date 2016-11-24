@@ -10,6 +10,16 @@
 		1E84558D1DE6B1B6002607DF /* SwiftyRest.h in Headers */ = {isa = PBXBuildFile; fileRef = 1E84558C1DE6B1B6002607DF /* SwiftyRest.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1E8455941DE6B1B6002607DF /* SwiftyRest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1E8455891DE6B1B6002607DF /* SwiftyRest.framework */; };
 		1E8455991DE6B1B6002607DF /* SwiftyRestTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E8455981DE6B1B6002607DF /* SwiftyRestTests.swift */; };
+		1E8455A51DE6B5EA002607DF /* ServiceConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E8455A41DE6B5EA002607DF /* ServiceConstants.swift */; };
+		1E8455A71DE6C965002607DF /* ServiceHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E8455A61DE6C965002607DF /* ServiceHelper.swift */; };
+		1E8455AA1DE6CA8B002607DF /* UriBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E8455A91DE6CA8B002607DF /* UriBuilder.swift */; };
+		1E8455AC1DE6CBCD002607DF /* LinkRel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E8455AB1DE6CBCD002607DF /* LinkRel.swift */; };
+		1E8455AE1DE6CC69002607DF /* RestRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E8455AD1DE6CC69002607DF /* RestRequest.swift */; };
+		1E8455B31DE6CD29002607DF /* LogUitility.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E8455B21DE6CD29002607DF /* LogUitility.swift */; };
+		1E8455B61DE6DA16002607DF /* Error.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E8455B51DE6DA16002607DF /* Error.swift */; };
+		1E8455B81DE6EA30002607DF /* Context.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E8455B71DE6EA30002607DF /* Context.swift */; };
+		1E8455BA1DE6EAAE002607DF /* FileUtility.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E8455B91DE6EAAE002607DF /* FileUtility.swift */; };
+		FB00F70B306E365F7398F841 /* Pods_SwiftyRest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 54B653E235C0DA39C926E5CB /* Pods_SwiftyRest.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -29,6 +39,19 @@
 		1E8455931DE6B1B6002607DF /* SwiftyRestTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SwiftyRestTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		1E8455981DE6B1B6002607DF /* SwiftyRestTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftyRestTests.swift; sourceTree = "<group>"; };
 		1E84559A1DE6B1B6002607DF /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		1E8455A41DE6B5EA002607DF /* ServiceConstants.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ServiceConstants.swift; sourceTree = "<group>"; };
+		1E8455A61DE6C965002607DF /* ServiceHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ServiceHelper.swift; sourceTree = "<group>"; };
+		1E8455A91DE6CA8B002607DF /* UriBuilder.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UriBuilder.swift; sourceTree = "<group>"; };
+		1E8455AB1DE6CBCD002607DF /* LinkRel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LinkRel.swift; sourceTree = "<group>"; };
+		1E8455AD1DE6CC69002607DF /* RestRequest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RestRequest.swift; sourceTree = "<group>"; };
+		1E8455B21DE6CD29002607DF /* LogUitility.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LogUitility.swift; sourceTree = "<group>"; };
+		1E8455B51DE6DA16002607DF /* Error.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Error.swift; sourceTree = "<group>"; };
+		1E8455B71DE6EA30002607DF /* Context.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Context.swift; sourceTree = "<group>"; };
+		1E8455B91DE6EAAE002607DF /* FileUtility.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FileUtility.swift; sourceTree = "<group>"; };
+		3761D4B0331658F87034F91D /* Pods-SwiftyRest.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SwiftyRest.debug.xcconfig"; path = "Pods/Target Support Files/Pods-SwiftyRest/Pods-SwiftyRest.debug.xcconfig"; sourceTree = "<group>"; };
+		54B653E235C0DA39C926E5CB /* Pods_SwiftyRest.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_SwiftyRest.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		7A517F53B287B1598B796F0E /* Pods-SwiftyRest.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SwiftyRest.release.xcconfig"; path = "Pods/Target Support Files/Pods-SwiftyRest/Pods-SwiftyRest.release.xcconfig"; sourceTree = "<group>"; };
+		91BA2397F286294F5840F652 /* Pods_Tests_SwiftyRestTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Tests_SwiftyRestTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -36,6 +59,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FB00F70B306E365F7398F841 /* Pods_SwiftyRest.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -50,12 +74,23 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		10853627996748D51A8097C9 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				3761D4B0331658F87034F91D /* Pods-SwiftyRest.debug.xcconfig */,
+				7A517F53B287B1598B796F0E /* Pods-SwiftyRest.release.xcconfig */,
+			);
+			name = Pods;
+			sourceTree = "<group>";
+		};
 		1E84557F1DE6B1B6002607DF = {
 			isa = PBXGroup;
 			children = (
 				1E84558B1DE6B1B6002607DF /* SwiftyRest */,
 				1E8455971DE6B1B6002607DF /* SwiftyRestTests */,
 				1E84558A1DE6B1B6002607DF /* Products */,
+				10853627996748D51A8097C9 /* Pods */,
+				B3E13CDF5A7343F86803BC6A /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -71,6 +106,11 @@
 		1E84558B1DE6B1B6002607DF /* SwiftyRest */ = {
 			isa = PBXGroup;
 			children = (
+				1E8455B41DE6DA08002607DF /* Error */,
+				1E8455B01DE6CD12002607DF /* Utility */,
+				1E8455AF1DE6CC73002607DF /* Request */,
+				1E8455A81DE6CA81002607DF /* Uri */,
+				1E8455A31DE6B5D6002607DF /* Base */,
 				1E84558C1DE6B1B6002607DF /* SwiftyRest.h */,
 				1E84558E1DE6B1B6002607DF /* Info.plist */,
 			);
@@ -84,6 +124,59 @@
 				1E84559A1DE6B1B6002607DF /* Info.plist */,
 			);
 			path = SwiftyRestTests;
+			sourceTree = "<group>";
+		};
+		1E8455A31DE6B5D6002607DF /* Base */ = {
+			isa = PBXGroup;
+			children = (
+				1E8455A41DE6B5EA002607DF /* ServiceConstants.swift */,
+				1E8455A61DE6C965002607DF /* ServiceHelper.swift */,
+			);
+			name = Base;
+			sourceTree = "<group>";
+		};
+		1E8455A81DE6CA81002607DF /* Uri */ = {
+			isa = PBXGroup;
+			children = (
+				1E8455A91DE6CA8B002607DF /* UriBuilder.swift */,
+				1E8455AB1DE6CBCD002607DF /* LinkRel.swift */,
+			);
+			name = Uri;
+			sourceTree = "<group>";
+		};
+		1E8455AF1DE6CC73002607DF /* Request */ = {
+			isa = PBXGroup;
+			children = (
+				1E8455AD1DE6CC69002607DF /* RestRequest.swift */,
+			);
+			name = Request;
+			sourceTree = "<group>";
+		};
+		1E8455B01DE6CD12002607DF /* Utility */ = {
+			isa = PBXGroup;
+			children = (
+				1E8455B21DE6CD29002607DF /* LogUitility.swift */,
+				1E8455B71DE6EA30002607DF /* Context.swift */,
+				1E8455B91DE6EAAE002607DF /* FileUtility.swift */,
+			);
+			name = Utility;
+			sourceTree = "<group>";
+		};
+		1E8455B41DE6DA08002607DF /* Error */ = {
+			isa = PBXGroup;
+			children = (
+				1E8455B51DE6DA16002607DF /* Error.swift */,
+			);
+			name = Error;
+			sourceTree = "<group>";
+		};
+		B3E13CDF5A7343F86803BC6A /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				54B653E235C0DA39C926E5CB /* Pods_SwiftyRest.framework */,
+				91BA2397F286294F5840F652 /* Pods_Tests_SwiftyRestTests.framework */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -104,10 +197,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 1E84559D1DE6B1B6002607DF /* Build configuration list for PBXNativeTarget "SwiftyRest" */;
 			buildPhases = (
+				1D009F93258B686B32A5E26F /* [CP] Check Pods Manifest.lock */,
 				1E8455841DE6B1B6002607DF /* Sources */,
 				1E8455851DE6B1B6002607DF /* Frameworks */,
 				1E8455861DE6B1B6002607DF /* Headers */,
 				1E8455871DE6B1B6002607DF /* Resources */,
+				2EEA6EC48A49975D0C7A4F5A /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -189,11 +284,53 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
+/* Begin PBXShellScriptBuildPhase section */
+		1D009F93258B686B32A5E26F /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [[ $? != 0 ]] ; then\n    cat << EOM\nerror: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\nEOM\n    exit 1\nfi\n";
+			showEnvVarsInLog = 0;
+		};
+		2EEA6EC48A49975D0C7A4F5A /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Copy Pods Resources";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-SwiftyRest/Pods-SwiftyRest-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		1E8455841DE6B1B6002607DF /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1E8455A51DE6B5EA002607DF /* ServiceConstants.swift in Sources */,
+				1E8455B31DE6CD29002607DF /* LogUitility.swift in Sources */,
+				1E8455AE1DE6CC69002607DF /* RestRequest.swift in Sources */,
+				1E8455AC1DE6CBCD002607DF /* LinkRel.swift in Sources */,
+				1E8455A71DE6C965002607DF /* ServiceHelper.swift in Sources */,
+				1E8455B81DE6EA30002607DF /* Context.swift in Sources */,
+				1E8455BA1DE6EAAE002607DF /* FileUtility.swift in Sources */,
+				1E8455B61DE6DA16002607DF /* Error.swift in Sources */,
+				1E8455AA1DE6CA8B002607DF /* UriBuilder.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -309,7 +446,9 @@
 		};
 		1E84559E1DE6B1B6002607DF /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 3761D4B0331658F87034F91D /* Pods-SwiftyRest.debug.xcconfig */;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				DEFINES_MODULE = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
@@ -320,12 +459,15 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.emc.SwiftyRest;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
 			name = Debug;
 		};
 		1E84559F1DE6B1B6002607DF /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 7A517F53B287B1598B796F0E /* Pods-SwiftyRest.release.xcconfig */;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				DEFINES_MODULE = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
@@ -378,6 +520,7 @@
 				1E84559F1DE6B1B6002607DF /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		1E8455A01DE6B1B6002607DF /* Build configuration list for PBXNativeTarget "SwiftyRestTests" */ = {
 			isa = XCConfigurationList;
@@ -386,6 +529,7 @@
 				1E8455A21DE6B1B6002607DF /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
