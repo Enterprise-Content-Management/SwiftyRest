@@ -3,10 +3,13 @@
 //  SwiftyRest
 //
 //  Created by Song, Michyo on 11/24/16.
-//  Copyright © 2016 Song, Michyo. All rights reserved.
+//  Copyright © 2016 EMC. All rights reserved.
 //
 
-enum LinkRel: String {
+/**
+ Link relation mapping for identifiers in REST
+ */
+public enum LinkRel: String {
     case selfRel = "self"
     case repositories = "http://identifiers.emc.com/linkrel/repositories"
     case cabinets = "http://identifiers.emc.com/linkrel/cabinets"
@@ -31,21 +34,5 @@ enum LinkRel: String {
     case comments = "http://identifiers.emc.com/linkrel/comments"
     case replies = "http://identifiers.emc.com/linkrel/replies"
     case permissions = "http://identifiers.emc.com/linkrel/permissions"
-    
-    static func getLink(linkRel: LinkRel, links: NSArray) -> String? {
-        var downloadUrl: String?
-        for link in links {
-            let link = link as! Dictionary<String, String>
-            if link["rel"] == linkRel.rawValue {
-                downloadUrl = link["href"]
-            }
-        }
-        return downloadUrl
-    }
-    
-    static func parentLinkTitle(parent: String, child: String) -> String {
-        return "Folder link between child \(child) and parent \(parent)"
-    }
-    
 }
 

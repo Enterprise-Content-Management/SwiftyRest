@@ -3,48 +3,71 @@
 //  SwiftyRest
 //
 //  Created by Song, Michyo on 11/24/16.
-//  Copyright © 2016 Song, Michyo. All rights reserved.
+//  Copyright © 2016 EMC. All rights reserved.
 //
 
 import Foundation
 
-class FileUtility {
-    static let fileManager = NSFileManager.defaultManager()
+/**
+ *  File management utility
+ */
+open class FileUtility {
+    static let fileManager = FileManager.default
     
-    static func isDownloaded(objectId: String) -> Bool {
+    /**
+     Identify whether object content of given ID has been downloaded or not.
+     - parameter    objectId:String The id of object to check.
+     - returns:Bool     True if content of this object has been downloaded.
+     */
+    open static func isDownloaded(_ objectId: String) -> Bool {
         let path = getFilePathFromId(objectId)
-        let flag = fileManager.fileExistsAtPath(path)
+        let flag = fileManager.fileExists(atPath: path)
         return flag
     }
     
-    static func deleteFile(objectId: String) {
+    /**
+     Delete content on device according to its object id.
+     Print log for this operation.
+     - parameter    objectId:String The id of object to delete.
+     */
+    open static func deleteFile(_ objectId: String) {
         let path = getFilePathFromId(objectId)
         if !isDownloaded(objectId) {
             return
         }
         do {
-            try fileManager.removeItemAtPath(path)
+            try fileManager.removeItem(atPath: path)
             printLog("Removed file at path of \(path)")
         } catch {
             printError("Error to remove file which id is \(objectId) on this device")
         }
     }
-    
-    static func getFileUrlFromId(objectId: String) -> NSURL {
-        let directoryUrl = fileManager.URLsForDirectory(.DocumentDirectory, inDomains: .UserDomainMask)[0]
+
+    /**
+     Get object content file local url by its id.
+     - parameter    objectId:String The id of object to get.
+     - returns:NSURL    The url path for this content on device.
+     */
+    open static func getFileUrlFromId(_ objectId: String) -> URL {
+        let directoryUrl = fileManager.urls(for: .documentDirectory, in: .userDomainMask)[0]
         let pathComponent = objectId
-        let fileUrl = directoryUrl.URLByAppendingPathComponent(pathComponent)
+        let fileUrl = directoryUrl.appendingPathComponent(pathComponent)
         return fileUrl
     }
     
-    static private func getFilePathFromId(objectId: String) -> String {
+    fileprivate static func getFilePathFromId(_ objectId: String) -> String {
         let url = getFileUrlFromId(objectId)
-        return url.path!
+        return url.path
     }
     
-    static func getSaveToUrl(objectId: String) -> NSURL {
-        let directoryUrl = fileManager.URLsForDirectory(.DocumentDirectory, inDomains: .UserDomainMask)[0]
+    /**
+     Save object content on device.
+     - parameter    objectId:String The id of object to save.
+     - returns:NSURL    The url path saved this content on device.
+     */
+    open static func getSaveToUrl(_ objectId: String) -> URL {
+        let directoryUrl = fileManager.urls(for: .documentDirectory, in: .userDomainMask)[0]
         let pathComponent = objectId
-        return directoryUrl.URLByAppendingPathComponent(pathComponent)
+        return directoryUrl.appendingPathComponent(pathComponent)
     }
 }

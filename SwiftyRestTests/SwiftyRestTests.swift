@@ -3,7 +3,7 @@
 //  SwiftyRestTests
 //
 //  Created by Song, Michyo on 11/24/16.
-//  Copyright © 2016 Song, Michyo. All rights reserved.
+//  Copyright © 2016 EMC. All rights reserved.
 //
 
 import XCTest
@@ -27,7 +27,7 @@ class SwiftyRestTests: XCTestCase {
     
     func testPerformanceExample() {
         // This is an example of a performance test case.
-        self.measureBlock {
+        self.measure {
             // Put the code you want to measure the time of here.
         }
     }

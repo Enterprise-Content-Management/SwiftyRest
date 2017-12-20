@@ -3,304 +3,473 @@
 //  SwiftyRest
 //
 //  Created by Song, Michyo on 11/24/16.
-//  Copyright © 2016 Song, Michyo. All rights reserved.
+//  Copyright © 2016 EMC. All rights reserved.
 //
 
 import Alamofire
 import SwiftyJSON
 
-class RestRequest: ServiceHelper {
-    // MARK: - Basic request
-    
-    private func sendRequest(
-        method: Alamofire.Method,
+open class RestRequest: RequestBase {
+        
+    /**
+     Get raw json response for certain request.
+     - parameter    method: String              The http method for rest service.
+     - parameter    url:String                  The url to request.
+     - parameter    userName:String             User name of authentication.
+     - parameter    password:String             Password of authentication.
+     - parameter    params:[String : String]    Parameters along with this request.
+     - parameter    completionHandler:(JSON?, Error?)->()
+                    Handler after getting response.
+                    If success, Error will be nil. Json stores raw respone.
+                    Otherwise, Json will be nil.
+     */
+    open static func getRawJson(
+        _ method: HttpMethod = .GET,
         url: String,
-        params: Dictionary<String, AnyObject>? = nil,
-        headers: [String: String]? = nil,
-        encoding: ParameterEncoding = .URL,
-        onSuccess: (JSON) -> (),
-        onFailure: (JSON) -> ()
-        ) {
-        Alamofire.request(method, url, parameters: params, headers: headers, encoding: encoding)
-            .validate()
-            .responseJSON { response in
-                switch response.result {
-                case .Success:
-                    printLog("Success request to \(url)")
-                    if let value = response.result.value {
-                        let json = JSON(value)
-                        onSuccess(json)
-                    }
-                case .Failure:
-                    let json = JSON(data: response.data!)
-                    printError("error: \(json)")
-                    onFailure(json)
-                }
-        }
+        params: [String : String] = [:],
+        userName: String = UriBuilder.getCurrentUserName(),
+        password: String = UriBuilder.getCurrentPassword(),
+        completionHandler: @escaping (JSON?, Error?) -> ()) {
+        let auth = "\(userName):\(password)" as NSString
+        sendRequest(method.method(), url: url, params: params as Dictionary<String, AnyObject>, headers: setBasicAuth(auth),
+            onSuccess: { json in
+                completionHandler(json, nil)
+            }, onFailure: { json in
+                let error = Error(json: json)
+                completionHandler(nil, error)
+            }
+        )
     }
 
     // MARK: - Entity Collection request
-    
-    private func getEntriesOnSuccess(json: JSON, completionHandler: (NSArray?, Error?) -> ()) {
-        let dictionary = json.object as! Dictionary<String, AnyObject>
-        let array = dictionary[ServiceConstants.ENTRIES] as? NSArray
-        completionHandler(array, nil)
+
+    /**
+     Get Rest collection response with parameters and authentication.
+     - parameter    url:String                  The url to request.
+     - parameter    userName:String             User name of authentication.
+     - parameter    password:String             Password of authentication.
+     - parameter    params:[String : String]    Parameters along with this request.
+     - parameter    completionHandler:(NSArray?, Error?)->()
+                    Handler after getting response.
+                    If success, Error will be nil. NSArray stores entries of respone.
+                    Otherwise, NSArray will be nil.
+     */
+    open static func getRestObjectCollection(
+        _ url: String, params: [String : String],
+        userName: String = UriBuilder.getCurrentUserName(),
+        password: String = UriBuilder.getCurrentPassword(),
+        completionHandler: @escaping (Array<RestObject>?, Error?) -> ()) {
+        getCollection(url, params: params, userName: userName, password: password, completionHandler: completionHandler)
     }
     
-    private func processFailureJson(json: JSON, completionHandler: (NSArray?, Error?) -> ()) {
-        let error = Error(json: json)
-        completionHandler(nil, error)
-    }
+    // MARK: - Get Single Object
     
-    func getResponseWithParams(url: String, params: [String: String], completionHandler: (NSArray?, Error?) -> ()) {
-        sendRequest(.GET, url: url, params: params,
-                    onSuccess: { json in
-                        self.getEntriesOnSuccess(json, completionHandler: completionHandler)
-            },
-                    onFailure: { json in
-                        self.processFailureJson(json, completionHandler: completionHandler)
-        })
-    }
-    
-    func getResponseWithAuthAndParam(url: String, params: [String : String], completionHandler: (NSArray?, Error?) -> ()) {
-        sendRequest(.GET, url: url, params: params, headers: setPreAuth(),
-                    onSuccess: { json in
-                        self.getEntriesOnSuccess(json, completionHandler: completionHandler)
-            },
-                    onFailure: { json in
-                        self.processFailureJson(json, completionHandler: completionHandler)
-        })
-    }
-    
-    // MARK: - Single Entity request
-    
-    private func getEntityOnSuccess(json: JSON, completionHandler: (NSDictionary?, Error?) -> ()) {
-        let dictionary = json.object as! Dictionary<String, AnyObject>
-        completionHandler(dictionary, nil)
-    }
-    
-    private func processFailureJson(json: JSON, completionHandler: (NSDictionary?, Error?) -> ()) {
-        let error = Error(json: json)
-        completionHandler(nil, error)
-    }
-    
-    func getRestObject(url: String, completionHandler: (NSDictionary?, Error?) -> ()) {
-        sendRequest(.GET, url: url, headers: self.setPreAuth(),
-                    onSuccess: { json in
-                        self.getEntityOnSuccess(json, completionHandler: completionHandler)
-            },
-                    onFailure: { json in
-                        self.processFailureJson(json, completionHandler: completionHandler)
-        })
+    /**
+     Get single Rest object with parameters and authentication.
+     - parameter    url:String                  The url to request.
+     - parameter    params:[String : String]    Parameters along with this request.
+     - parameter    userName:String             User name of authentication.
+     - parameter    password:String             Password of authentication.
+     - parameter    completionHandler:(NSDictionary?, Error?)->()
+     Handler after getting response.
+     If success, Error will be nil. NSDictionary stores information for objec.
+     Otherwise, NSDictionary will be nil.
+     */
+    open static func getRestObject(
+        _ url: String,
+        params: [String : String]? = nil,
+        userName: String = UriBuilder.getCurrentUserName(),
+        password: String = UriBuilder.getCurrentPassword(),
+        completionHandler: @escaping (RestObject?, Error?) -> ()) {
+        getSingle(url, params: params, userName: userName, password: password, completionHandler: completionHandler)
     }
     
     // MARK: - CRUD control requests
     
-    func deleteWithAuth(url: String, completionHandler: (NSDictionary?, Error?) -> ()) {
-        sendRequest(.DELETE, url: url, headers: self.setPreAuth(),
+    /**
+     Delete an object with parameters and authentication.
+     - parameter    url:String                  The url to request.
+     - parameter    params:[String : String]    Parameters along with this request.
+     - parameter    userName:String             User name of authentication.
+     - parameter    password:String             Password of authentication.
+     - parameter    completionHandler:(NSDictionary?, Error?)->()
+                    Handler after getting response.
+                    If success, Error will be nil. NSDictionary is response of request.
+                    Otherwise, NSDictionary will be nil.
+     */
+    open static func deleteWithAuth(
+        _ url: String,
+        params: [String : String]? = nil,
+        userName: String = UriBuilder.getCurrentUserName(),
+        password: String = UriBuilder.getCurrentPassword(),
+        completionHandler: @escaping (Bool, Error?) -> ()) {
+        let auth = "\(userName):\(password)" as NSString
+        sendRequest(.delete, url: url, headers: self.setBasicAuth(auth),
                     onSuccess: { json in
-                        self.getEntityOnSuccess(json, completionHandler: completionHandler)
+                        noContentOnSuccess(completionHandler)
             },
                     onFailure: { json in
-                        self.processFailureJson(json, completionHandler: completionHandler)
+                        processNoContentFailure(json, completionHandler: completionHandler)
         })
     }
     
-    func updateWithAuth(url: String, requestBody: Dictionary<String, AnyObject>, completionHandler: (NSDictionary?, Error?) -> ()) {
-        sendRequest(.POST, url: url, headers: getPostRequestHeaders(), params: requestBody, encoding: .JSON,
+    /**
+     Update an object using POST by request body with parameters and authentication.
+     - parameter    url:String                  The url to request.
+     - parameter    requestBody:Dictionary<String, AnyObject>    RequestBody to update object.
+     - parameter    userName:String             User name of authentication.
+     - parameter    password:String             Password of authentication.
+     - parameter    completionHandler:(NSDictionary?, Error?)->()
+                    Handler after getting response.
+                    If success, Error will be nil. NSDictionary is response of request.
+                    Otherwise, NSDictionary will be nil.
+     */
+    open static func updateWithAuth(
+        _ url: String,
+        requestBody: Dictionary<String, AnyObject>,
+        userName: String = UriBuilder.getCurrentUserName(),
+        password: String = UriBuilder.getCurrentPassword(),
+        completionHandler: @escaping (RestObject?, Error?) -> ()) {
+        let auth = "\(userName):\(password)" as NSString
+        sendRequest(.post, url: url, params: requestBody, headers: getPostRequestHeaders(auth), encoding: JSONEncoding.default,
                     onSuccess:{ json in
-                        self.getEntityOnSuccess(json,  completionHandler: completionHandler)
+                        getEntityOnSuccess(json,  completionHandler: completionHandler)
             },
                     onFailure: { json in
-                        self.processFailureJson(json, completionHandler: completionHandler)
+                        processFailureJson(json, completionHandler: completionHandler)
         })
     }
     
-    func createWithAuth(url: String, requestBody: Dictionary<String, AnyObject>, completionHandler: (NSDictionary?, Error?) -> ()) {
-        sendRequest(.POST, url: url, headers: self.getPostRequestHeaders(), params: requestBody, encoding: .JSON,
-                    onSuccess: { json in
-                        self.getEntityOnSuccess(json, completionHandler: completionHandler)
+    /**
+     Update an object using PUT with parameters and authentication.
+     - parameter    url:String                  The url to request.
+     - parameter    userName:String             User name of authentication.
+     - parameter    password:String             Password of authentication.
+     - parameter    completionHandler:(NSDictionary?, Error?)->()
+                    Handler after getting response.
+                    If success, Error will be nil. NSDictionary is response of request.
+                    Otherwise, NSDictionary will be nil.
+     */
+    open static func updateWithAuthByPut(
+        _ url: String,
+        userName: String = UriBuilder.getCurrentUserName(),
+        password: String = UriBuilder.getCurrentPassword(),
+        completionHandler: @escaping (RestObject?, Error?) -> ()
+        ) {
+        let auth = "\(userName):\(password)" as NSString
+        sendRequest(.put, url: url, headers: getPostRequestHeaders(auth), encoding: JSONEncoding.default,
+                    onSuccess:{ json in
+                        getEntityOnSuccess(json,  completionHandler: completionHandler)
             },
                     onFailure: { json in
-                        self.processFailureJson(json, completionHandler: completionHandler)
+                        processFailureJson(json, completionHandler: completionHandler)
         })
     }
     
-    internal func getRepositoriesUrlOnSuccess(json: JSON, completionHandler: (String?, Error?) -> ()) {
-        let resources = json["resources"].dictionary!
-        let repositories = resources[LinkRel.repositories.rawValue]?.dictionary
-        let url = repositories!["href"]?.stringValue
-        let about = resources["about"]?.dictionary
-        Context.productInfoUrl = about!["href"]?.stringValue
-        completionHandler(url, nil)
-    }
-    
-    internal func processFailureJson(json: JSON, completionHandler: (String?, Error?) -> ()) {
-        let error = Error(json: json)
-        completionHandler(nil, error)
-    }
-    
-    internal func getRepositoriesUrl(rootUrl: String, serviceContext: String, completionHandler: (String?, Error?) -> ()) {
-        sendRequest(.GET, url: UriBuilder.getServicesUrl(rootUrl, serviceContext: serviceContext),
+    /**
+     Create an object by request body with parameters and authentication.
+     - parameter    url:String                  The url to request.
+     - parameter    requestBody:Dictionary<String, AnyObject>    RequestBody to create object.
+     - parameter    userName:String             User name of authentication.
+     - parameter    password:String             Password of authentication.
+     - parameter    completionHandler:(NSDictionary?, Error?)->()
+                    Handler after getting response.
+                    If success, Error will be nil. NSDictionary contains information of created object.
+                    Otherwise, NSDictionary will be nil.
+     */
+    open static func createWithAuth(
+        _ url: String,
+        requestBody: Dictionary<String, AnyObject>,
+        userName: String = UriBuilder.getCurrentUserName(),
+        password: String = UriBuilder.getCurrentPassword(),
+        completionHandler: @escaping (RestObject?, Error?) -> ()) {
+        sendRequest(.post, url: url, params: requestBody, headers: self.getPostRequestHeaders(), encoding: JSONEncoding.default,
                     onSuccess: { json in
-                        self.getRepositoriesUrlOnSuccess(json, completionHandler: completionHandler)
-            }, onFailure: { json in
-                self.processFailureJson(json, completionHandler: completionHandler)
+                        getEntityOnSuccess(json, completionHandler: completionHandler)
+            },
+                    onFailure: { json in
+                        processFailureJson(json, completionHandler: completionHandler)
         })
+    }
+    
+    /**
+     Get repository url for current Rest services.
+     - parameter    rootUrl:String                  The root url for REST Service.
+     - parameter    serviceContext: String          The service context for REST Service.
+     - parameter    completionHandler:(String?, Error?)->()
+                    Handler after getting response.
+                    If success, Error will be nil. String is repositories url for REST service.
+                    Otherwise, String will be nil.
+     */
+    open static func getRepositoriesUrl(_ rootUrl: String, serviceContext: String, completionHandler: @escaping (String?, Error?) -> ()) {
+        let uriBuilder = UriBuilder(rootUrl: rootUrl, context: serviceContext)
+        sendRequest(.get, url: uriBuilder.getServicesUrl(),
+                    onSuccess: { json in
+                        getRepositoriesUrlOnSuccess(json, completionHandler: completionHandler)
+                 }, onFailure: { json in
+                        processFailureJson(json, completionHandler: completionHandler)
+        })
+    }
+    
+    /**
+     Get product info for current Rest services.
+     - parameter    rootUrl:String                  The root url for REST Service.
+     - parameter    serviceContext: String          The service context for REST Service.
+     - parameter    completionHandler:(NSDictionary?, Error?)->()
+                    Handler after getting response.
+                    If success, Error will be nil. NSDictionary is properties of product info.
+                    Otherwise, NSDictionary will be nil.
+     */
+    open static func getProductInfo(_ rootUrl: String, context: String, completionHandler: @escaping (NSDictionary?, Error?) -> ()){
+        if UriBuilder.productInfoUrl.isEmpty {
+            let uriBuilder = UriBuilder(rootUrl: rootUrl, context: context)
+            UriBuilder.productInfoUrl = uriBuilder.getProductInfo()
+        }
+        getRawJson(url: UriBuilder.productInfoUrl) { json, error in
+            if let json = json {
+                let productInfo = json.dictionary![ObjectProperties.PROPERTIES.rawValue]!.dictionaryObject!
+                completionHandler(productInfo as NSDictionary, nil)
+            } else {
+                completionHandler(nil, error!)
+            }
+        }
     }
     
     // MARK: - Upload and Downlad files
-    func uploadFile(
-        url: String,
+    /**
+     Upload a content file for certain object.
+     - parameter    url:String                  The url to request.
+     - parameter    userName:String             User name of authentication.
+     - parameter    password:String             Password of authentication.
+     - parameter    metadata:JSON               Meta data for object content in JSON format.
+     - parameter    file:NSData                 Content file in NSData format.
+     - parameter    type:String                 MIME type for this content file.
+     - parameter    completionHandler:(NSDictionary?, Error?)->()
+                    Handler after getting response.
+                    If success, Error will be nil. NSDictionary is response of Rest service.
+                    Otherwise, NSDictionary will be nil.
+     */
+    open static func uploadFile(
+        _ url: String,
+        userName: String = UriBuilder.getCurrentUserName(),
+        password: String = UriBuilder.getCurrentPassword(),
         metadata: JSON,
-        file: NSData,
+        file: Data,
         type: String,
-        completionHandler: (NSDictionary?, Error?) -> ()
+        completionHandler: @escaping (NSDictionary?, Error?) -> ()
         ) {
+        let auth = "\(userName):\(password)" as NSString
+        
+        
         Alamofire.upload(
-            .POST, url, headers: self.getUploadRequestHeaders(),
-            multipartFormData: { multipartFormData in
-                multipartFormData.appendBodyPart(
-                    data: self.getNSDataFromJSON(metadata),
-                    name: "metadata",
-                    mimeType: ServiceConstants.MIME_JSON
-                )
-                multipartFormData.appendBodyPart(
-                    data: file, name: "binary",
-                    mimeType: type
-                )
+            multipartFormData: { (multipart) in
+                multipart.append(self.getNSDataFromJSON(metadata), withName: "metadata", mimeType: ServiceConstants.MIME_JSON)
+                multipart.append(file, withName: "binary", mimeType: type)
             },
+            usingThreshold: UInt64.init(),
+            to: url, method: .post,
+            headers: ServiceHelper.getUploadRequestHeaders(auth),
             encodingCompletion: { encodingResult in
                 switch encodingResult {
-                case .Success(let upload, _, _):
+                case .success(let upload, _, _):
                     upload.validate()
                     upload.responseJSON  { response in
                         switch response.result {
-                        case .Success:
+                        case .success:
                             let value = response.result.value!
                             let json = JSON(value)
                             let dic = json.object as! Dictionary<String, AnyObject>
-                            completionHandler(dic, nil)
-                        case .Failure:
-                            let json = JSON(data: response.data!)
+                            completionHandler(dic as NSDictionary, nil)
+                        case .failure:
+                            let json = try! JSON(data: response.data!)
                             printError("error: \(json)")
                             completionHandler(nil, Error(json: json))
                         }
                     }
-                case .Failure(let encodingError):
+                case .failure(let encodingError):
                     print(encodingError)
                 }
-        })
+            })
+        
+//        Alamofire.upload(
+//            multipartFormData: { multipartFormData in
+//                multipartFormData.append(self.getNSDataFromJSON(metadata), withName: "metadata", mimeType: ServiceConstants.MIME_JSON)
+//                multipartFormData.append(file, withName: "binary", mimeType: type)
+//            },
+//            usingThreshold: UInt64.init(),
+//            method: .post,
+////            headers: ServiceHelper.getUploadRequestHeaders(auth) as [String: String],
+//            
+//            to: url,
+//            encodingCompletion: { encodingResult in
+//                switch encodingResult {
+//                case .success(let upload, _, _):
+//                    upload.validate()
+//                    upload.responseJSON  { response in
+//                        switch response.result {
+//                        case .success:
+//                            let value = response.result.value!
+//                            let json = JSON(value)
+//                            let dic = json.object as! Dictionary<String, AnyObject>
+//                            completionHandler(dic as NSDictionary, nil)
+//                        case .failure:
+//                            let json = JSON(data: response.data!)
+//                            printError("error: \(json)")
+//                            completionHandler(nil, Error(json: json))
+//                        }
+//                    }
+//                case .failure(let encodingError):
+//                    print(encodingError)
+//                }
+//        })
     }
     
-    func downloadFile(
-        url: String,
+    /**
+     Download from url for content of object.
+     - parameter    url:String                  The url to request.
+     - parameter    userName:String             User name of authentication.
+     - parameter    password:String             Password of authentication.
+     - parameter    objectId:String             The object id for object of this content to identify it.
+     - parameter    completionHandler:(NSData?, Error?)->()
+                    Handler after getting response.
+                    If success, Error will be nil. NSData is data source of this content.
+                    Otherwise, NSData will be nil.
+     */
+    open static func downloadFile(
+        _ url: String,
+        userName: String = UriBuilder.getCurrentUserName(),
+        password: String = UriBuilder.getCurrentPassword(),
         objectId: String,
-        completionHandler: (NSData?, Error?) -> ()
+        completionHandler: @escaping (Data?, Error?) -> ()
         ) {
-        var fileUrl: NSURL?
-        Alamofire.download(
-            .GET, url,
-            headers: self.getDownloadRequestHeaders()
-        ) { temporaryUrl, response in
-            fileUrl = FileUtility.getSaveToUrl(objectId)
-            FileUtility.deleteFile(objectId)
-            
-            printLog("Download path: \(fileUrl!.absoluteString)")
-            return fileUrl!
-            }
-            .response { request, response, data, error in
-                if let error = error {
-                    let userInfo = error.userInfo as [NSObject: AnyObject]
-                    let url = userInfo["NSErrorFailingURLStringKey"] as! String
-                    let parts = url.characters.split("/").map(String.init)
-                    let hostname = parts[1].characters.split(":").map(String.init)[0]
-                    let e = Error(msg: "A server with the specified hostname '\(hostname)' could not be recognizable by this device.")
-                    printError("Failed with error:\(error).")
-                    completionHandler(nil, e)
-                } else {
-                    printLog("Downloaded file successfully.")
-                    completionHandler(NSData(contentsOfURL: fileUrl!), nil)
-                }
+        let auth = "\(userName):\(password)" as NSString
+    
+        let destination: DownloadRequest.DownloadFileDestination = {_, _ in
+            let fileUrl = FileUtility.getSaveToUrl(objectId)
+            return (fileUrl, [.removePreviousFile, .createIntermediateDirectories])
+        }
+        Alamofire.download(url, method: .get, headers: ServiceHelper.getDownloadRequestHeaders(auth), to: destination)
+            .response { response in
+                debugPrint(response)
         }
     }
     
     // MARK: - Misc control
-    func moveObject(
-        url: String,
+    /**
+     Move an object by request body with parameters and authentication.
+     - parameter    url:String                  The url to request.
+     - parameter    requestBody:Dictionary<String, AnyObject>    RequestBody to create object.
+     - parameter    userName:String             User name of authentication.
+     - parameter    password:String             Password of authentication.
+     - parameter    completionHandler:(NSDictionary?, Error?)->()
+                    Handler after getting response.
+                    If success, Error will be nil. NSDictionary contains information of moved object.
+                    Otherwise, NSDictionary will be nil.
+     */
+    open static func moveObject(
+        _ url: String,
         requestBody: Dictionary<String, AnyObject>,
-        completionHandler: (NSDictionary?, Error?) -> ()) {
-        Alamofire.request(.PUT, url, parameters: requestBody, headers: self.getPostRequestHeaders(), encoding: .JSON)
-            .validate()
-            .responseJSON { response in
-                switch response.result {
-                case .Success:
-                    printLog("Success move to \(url).")
-                    let json = JSON(response.result.value!)
-                    completionHandler(json.object as? NSDictionary, nil)
-                case .Failure:
-                    let json = JSON(data: response.data!)
-                    printError("error: \(json)")
-                    let error = Error(json: json)
-                    completionHandler(nil, error)
-                }
-        }
+        userName: String = UriBuilder.getCurrentUserName(),
+        password: String = UriBuilder.getCurrentPassword(),
+        completionHandler: @escaping (RestObject?, Error?) -> ()) {
+        let auth = "\(userName):\(password)" as NSString
+        sendRequest(.put, url: url, params: requestBody, headers: self.getPostRequestHeaders(auth), encoding: JSONEncoding.default,
+                    onSuccess: { json in
+                         getEntityOnSuccess(json, completionHandler: completionHandler)
+                        },
+                    onFailure: { json in
+                        processFailureJson(json, completionHandler: completionHandler)
+            })
     }
     
     // MARK: - Response with no content
-    private func sendRequestForResponse(
-        method: Alamofire.Method,
-        url: String,
-        params: Dictionary<String, AnyObject>? = nil,
-        headers: [String: String]? = nil,
-        encoding: ParameterEncoding = .URL,
-        onResponse: (String) -> ()
-        ) {
-        Alamofire.request(method, url, parameters: params, headers: headers, encoding: encoding)
-            .validate()
-            .response { request, response, data, error in
-                let statusCode = response!.statusCode as Int
-                let result: String!
-                if error != nil {
-                    let json = JSON(data: data!)
-                    printError("error: \(json)")
-                    let e = json.object as! NSDictionary
-                    result = e["message"] as! String
-                } else {
-                    printLog("Success request to \(url) with status code \(statusCode)")
-                    result = "Success"
-                }
-                onResponse(result)
-        }
+    
+    /**
+     Add membership for a Group.
+     - parameter    url:String                  The url to request.
+     - parameter    userName:String             User name of authentication.
+     - parameter    password:String             Password of authentication.
+     - parameter    requestBody:Dictionary<String, AnyObject>    RequestBody to add membership.
+     - parameter    completionHandler:(Bool, Error?)->()
+                    Handler after getting response.
+                    If success, Error will be nil. Bool will be true.
+                    Otherwise, Bool will be false.
+     */
+    open static func addMembership(
+        _ url: String,
+        userName: String = UriBuilder.getCurrentUserName(),
+        password: String = UriBuilder.getCurrentPassword(),
+        requestBody: Dictionary<String, AnyObject>,
+        completionHandler: @escaping (Bool, Error?) -> ()) {
+        let auth = "\(userName):\(password)" as NSString
+        sendRequestForResponse(.post, url: url, params: requestBody, headers: ServiceHelper.getPostRequestHeaders(auth), encoding: JSONEncoding.default, onResponse: completionHandler)
     }
     
-    func addMembership(
-        url: String,
+    // MARK: - Batch requests
+    
+    /**
+     Post a batch request to batch url.
+     - parameter    batchUrl:String             The url of batch relation.
+     - parameter    userName:String             User name of authentication.
+     - parameter    password:String             Password of authentication.
+     - parameter    requestBody:Dictionary<String, AnyObject>    RequestBody for this batch request.
+     - parameter    completionHandler:([Bool], Error?)->()
+                    Handler after getting response.
+                    If success, Error will be nil. Array of Bool contains result of every request in batch.
+                    True means this request is successful while False means failure.
+     */
+    open static func batchRequest(
+        _ batchUrl: String,
+        userName: String = UriBuilder.getCurrentUserName(),
+        password: String = UriBuilder.getCurrentPassword(),
         requestBody: Dictionary<String, AnyObject>,
-        completionHandler: (String?, Error?) -> ()) {
-        sendRequestForResponse(.POST, url: url, params: requestBody, headers: self.getPostRequestHeaders(), encoding: .JSON) { result in
-            if result == "Success" {
-                completionHandler("Success", nil)
-            } else {
-                completionHandler(nil, Error(msg: result))
+        completionHandler: @escaping ([Bool], Error?) -> ()) {
+        sendRequest(.post, url: batchUrl, params: requestBody, headers: self.getPostRequestHeaders(), encoding: JSONEncoding.default,
+                    onSuccess: { json in
+                        getBatchResponseOnSuccess(json, completionHandler: completionHandler)
+            },
+                    onFailure: { json in
+                        processFailureBatch(json, completionHandler: completionHandler)
+        })
+        
+    }
+    
+    // MARK: - More request
+    
+    /**
+     Add membership for a Group.
+     - parameter    searchUrl:String            The search url w/o template.
+     - parameter    userName:String             User name of authentication.
+     - parameter    password:String             Password of authentication.
+     - parameter    location:String             The location in folder path format to search from.
+     - parameter    keyword:String              The keyword to search for.
+     - parameter    inline:Bool                 To search with inline or not.
+     - parameter    otherParams:[String: String]?   Other parameters to send along with request.
+     - parameter    completionHandler:(Array<RestObject>?, Error?)->()
+                    Handler after getting response.
+                    If success, Error will be nil. Array will contain search results.
+                    Otherwise, Array will be nil.
+     */
+    open static func fullTextSearch(
+        _ searchUrl: String,
+        userName: String = UriBuilder.getCurrentUserName(),
+        password: String = UriBuilder.getCurrentPassword(),
+        location: String? = nil,
+        keyword: String,
+        inline: Bool = false,
+        otherParams: [String: String]? = nil,
+        completionHandler: @escaping (Array<RestObject>?, Error?) -> ()
+        ) {
+        let url = searchUrl.split(separator: "{").map(String.init)[0]
+        var params = ["q": keyword, "inline": String(inline)] as [String: String]
+        if let location = location {
+            params["locations"] = location
+        }
+        if let others = otherParams {
+            for param in others {
+                params[param.0] = param.1
             }
         }
-    }
-    
-    // MARK: - Helper
-    
-    private func getNSDataFromNSDictionary(dic: NSDictionary) -> NSData {
-        let data = NSKeyedArchiver.archivedDataWithRootObject(dic)
-        return data
-    }
-    
-    private func getNSDataFromJSON(json: JSON) -> NSData {
-        let data: NSData?
-        do {
-            data = try json.rawData()
-        } catch _ {
-            data = nil
-        }
-        return data!
+        getCollection(url, params: params, userName: userName, password: password, completionHandler: completionHandler)
     }
 }

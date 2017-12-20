@@ -1,14 +1,14 @@
 # Uncomment this line to define a global platform for your project
-platform :ios, '9.0'
+platform :ios, '10.3'
 
 target 'SwiftyRest' do
   # Uncomment this line if you're using Swift or would like to use dynamic frameworks
   # use_frameworks!
 
   # Pods for SwiftyCoreRest
-  pod 'Alamofire', '~> 3.4.2'
-  pod 'SwiftyJSON’, '~> 2.4.0'
-  pod 'SwiftLog', :git => "https://github.com/daltoniam/SwiftLog.git"
+  pod 'Alamofire', '~> 4.5'
+  pod 'SwiftyJSON’, '~> 4.0.0'
+  pod 'SwiftLog', '~> 0.9.1'
 
     # abstract_target 'Tests' do
     # inherit! :search_paths

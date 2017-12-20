@@ -3,7 +3,7 @@
 //  SwiftyRest
 //
 //  Created by Song, Michyo on 11/24/16.
-//  Copyright © 2016 Song, Michyo. All rights reserved.
+//  Copyright © 2016 EMC. All rights reserved.
 //
 
 import SwiftLog
@@ -16,22 +16,30 @@ class LogUtility {
         return Static.instance
     }
     
-    private init() {
+    fileprivate init() {
         Log.logger.name = "SwiftyRest.log"
         Log.logger.maxFileSize = 2048
         Log.logger.maxFileCount = 8
     }
     
     
-    static func print(message: String) {
+    static func print(_ message: String) {
         logw(message)
     }
 }
 
-public func printLog(message: String) {
+/**
+ *  Print log on console and log file.
+ *  - parameter message:String  the message should be printed as LOG.
+ */
+public func printLog(_ message: String) {
     LogUtility.print("[LOG]\t\(message)")
 }
 
-public func printError(message: String) {
+/**
+ *  Print log on console and log file.
+ *  - parameter message:String  the message should be printed as ERR.
+ */
+public func printError(_ message: String) {
     LogUtility.print("[ERR] \t\(message)")
 }

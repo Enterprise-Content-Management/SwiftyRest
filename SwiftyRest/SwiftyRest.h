@@ -3,7 +3,7 @@
 //  SwiftyRest
 //
 //  Created by Song, Michyo on 11/24/16.
-//  Copyright © 2016 Song, Michyo. All rights reserved.
+//  Copyright © 2016 EMC. All rights reserved.
 //
 
 #import <UIKit/UIKit.h>
