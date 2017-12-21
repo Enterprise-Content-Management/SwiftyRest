@@ -16,13 +16,14 @@
 		1E8455AC1DE6CBCD002607DF /* LinkRel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E8455AB1DE6CBCD002607DF /* LinkRel.swift */; };
 		1E8455AE1DE6CC69002607DF /* RestRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E8455AD1DE6CC69002607DF /* RestRequest.swift */; };
 		1E8455B31DE6CD29002607DF /* LogUitility.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E8455B21DE6CD29002607DF /* LogUitility.swift */; };
-		1E8455B61DE6DA16002607DF /* Error.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E8455B51DE6DA16002607DF /* Error.swift */; };
+		1E8455B61DE6DA16002607DF /* RestError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E8455B51DE6DA16002607DF /* RestError.swift */; };
 		1E8455BA1DE6EAAE002607DF /* FileUtility.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E8455B91DE6EAAE002607DF /* FileUtility.swift */; };
 		1E8456BD1DEFBCD8002607DF /* RequestBase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E8456BC1DEFBCD8002607DF /* RequestBase.swift */; };
 		1E8456C01DEFD065002607DF /* RestObject.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E8456BF1DEFD065002607DF /* RestObject.swift */; };
 		1E8456C21DEFEA5A002607DF /* ObjectProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E8456C11DEFEA5A002607DF /* ObjectProperties.swift */; };
 		1E8458961DF545E8002607DF /* RequestHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E8458951DF545E8002607DF /* RequestHelper.swift */; };
 		1E8458981DF54784002607DF /* Utility.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E8458971DF54784002607DF /* Utility.swift */; };
+		1EBF23BD1FEB84FF00846975 /* AuthManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EBF23BC1FEB84FF00846975 /* AuthManager.swift */; };
 		FB00F70B306E365F7398F841 /* Pods_SwiftyRest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 54B653E235C0DA39C926E5CB /* Pods_SwiftyRest.framework */; };
 /* End PBXBuildFile section */
 
@@ -49,13 +50,14 @@
 		1E8455AB1DE6CBCD002607DF /* LinkRel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LinkRel.swift; sourceTree = "<group>"; };
 		1E8455AD1DE6CC69002607DF /* RestRequest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RestRequest.swift; sourceTree = "<group>"; };
 		1E8455B21DE6CD29002607DF /* LogUitility.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LogUitility.swift; sourceTree = "<group>"; };
-		1E8455B51DE6DA16002607DF /* Error.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Error.swift; sourceTree = "<group>"; };
+		1E8455B51DE6DA16002607DF /* RestError.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RestError.swift; sourceTree = "<group>"; };
 		1E8455B91DE6EAAE002607DF /* FileUtility.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FileUtility.swift; sourceTree = "<group>"; };
 		1E8456BC1DEFBCD8002607DF /* RequestBase.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RequestBase.swift; sourceTree = "<group>"; };
 		1E8456BF1DEFD065002607DF /* RestObject.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RestObject.swift; sourceTree = "<group>"; };
 		1E8456C11DEFEA5A002607DF /* ObjectProperties.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ObjectProperties.swift; sourceTree = "<group>"; };
 		1E8458951DF545E8002607DF /* RequestHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RequestHelper.swift; sourceTree = "<group>"; };
 		1E8458971DF54784002607DF /* Utility.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Utility.swift; sourceTree = "<group>"; };
+		1EBF23BC1FEB84FF00846975 /* AuthManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthManager.swift; sourceTree = "<group>"; };
 		3761D4B0331658F87034F91D /* Pods-SwiftyRest.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SwiftyRest.debug.xcconfig"; path = "Pods/Target Support Files/Pods-SwiftyRest/Pods-SwiftyRest.debug.xcconfig"; sourceTree = "<group>"; };
 		54B653E235C0DA39C926E5CB /* Pods_SwiftyRest.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_SwiftyRest.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		7A517F53B287B1598B796F0E /* Pods-SwiftyRest.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SwiftyRest.release.xcconfig"; path = "Pods/Target Support Files/Pods-SwiftyRest/Pods-SwiftyRest.release.xcconfig"; sourceTree = "<group>"; };
@@ -114,6 +116,7 @@
 		1E84558B1DE6B1B6002607DF /* SwiftyRest */ = {
 			isa = PBXGroup;
 			children = (
+				1EBF23BB1FEB84E300846975 /* Auth */,
 				1E8456BE1DEFD05A002607DF /* Model */,
 				1E8455B41DE6DA08002607DF /* Error */,
 				1E8455B01DE6CD12002607DF /* Utility */,
@@ -176,7 +179,7 @@
 		1E8455B41DE6DA08002607DF /* Error */ = {
 			isa = PBXGroup;
 			children = (
-				1E8455B51DE6DA16002607DF /* Error.swift */,
+				1E8455B51DE6DA16002607DF /* RestError.swift */,
 			);
 			name = Error;
 			sourceTree = "<group>";
@@ -188,6 +191,14 @@
 				1E8456C11DEFEA5A002607DF /* ObjectProperties.swift */,
 			);
 			name = Model;
+			sourceTree = "<group>";
+		};
+		1EBF23BB1FEB84E300846975 /* Auth */ = {
+			isa = PBXGroup;
+			children = (
+				1EBF23BC1FEB84FF00846975 /* AuthManager.swift */,
+			);
+			name = Auth;
 			sourceTree = "<group>";
 		};
 		B3E13CDF5A7343F86803BC6A /* Frameworks */ = {
@@ -259,7 +270,7 @@
 			attributes = {
 				LastSwiftUpdateCheck = 0730;
 				LastUpgradeCheck = 0920;
-				ORGANIZATIONNAME = EMC;
+				ORGANIZATIONNAME = OpenText;
 				TargetAttributes = {
 					1E8455881DE6B1B6002607DF = {
 						CreatedOnToolsVersion = 7.3.1;
@@ -348,6 +359,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				1E8455A51DE6B5EA002607DF /* ServiceConstants.swift in Sources */,
+				1EBF23BD1FEB84FF00846975 /* AuthManager.swift in Sources */,
 				1E8456C21DEFEA5A002607DF /* ObjectProperties.swift in Sources */,
 				1E8455B31DE6CD29002607DF /* LogUitility.swift in Sources */,
 				1E8458961DF545E8002607DF /* RequestHelper.swift in Sources */,
@@ -358,7 +370,7 @@
 				1E8456BD1DEFBCD8002607DF /* RequestBase.swift in Sources */,
 				1E8456C01DEFD065002607DF /* RestObject.swift in Sources */,
 				1E8455BA1DE6EAAE002607DF /* FileUtility.swift in Sources */,
-				1E8455B61DE6DA16002607DF /* Error.swift in Sources */,
+				1E8455B61DE6DA16002607DF /* RestError.swift in Sources */,
 				1E8455AA1DE6CA8B002607DF /* UriBuilder.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -500,8 +512,9 @@
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CLANG_ENABLE_MODULES = YES;
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = "";
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -523,8 +536,9 @@
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CLANG_ENABLE_MODULES = YES;
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = "";
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -534,6 +548,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.emc.SwiftyRest;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
 				SWIFT_VERSION = 4.0;
 			};

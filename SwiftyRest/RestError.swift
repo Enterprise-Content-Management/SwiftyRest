@@ -10,7 +10,9 @@ import SwiftyJSON
 /**
  *  The Error model in REST service.
  */
-open class Error {
+
+public struct RestError: Error {
+    
     /// Status code
     var status: NSInteger!
     /// Error code
@@ -18,7 +20,7 @@ open class Error {
     var message: String!
     var details: String!
     var id: String!
-    
+
     /**
      Initialize an Error model from self defined message w/o detail.
      -  parameter   msg:String      The message want to show.
@@ -36,7 +38,7 @@ open class Error {
         details = detail
         id = "ID"
     }
-    
+
     /**
      Initialize an Error model from response of REST service in JSON format.
      -  parameter   json:JSON    The JSON format response given by REST.
@@ -52,24 +54,25 @@ open class Error {
         details = json["details"].stringValue
         id = json["id"].stringValue
     }
-    
-    open func getStatus() -> Int {
+
+    public func getStatus() -> Int {
         return status
     }
-    
-    open func getErrorCode() -> String {
+
+    public func getErrorCode() -> String {
         return errorCode
     }
-    
-    open func getMessage() -> String {
+
+    public func getMessage() -> String {
         return message
     }
-    
-    open func getDetails() -> String {
+
+    public func getDetails() -> String {
         return details
     }
-    
-    open func getId() -> String {
+
+    public func getId() -> String {
         return id
     }
 }
+

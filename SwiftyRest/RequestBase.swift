@@ -24,7 +24,7 @@ open class RequestBase : ServiceHelper {
     internal static func sendRequest(
         _ method: HTTPMethod,
         url: String,
-        params: Dictionary<String, AnyObject>? = nil,
+        params: [String: Any]? = nil,
         headers: [String: String]? = nil,
         encoding: ParameterEncoding = URLEncoding.default,
         onSuccess: @escaping (JSON) -> (),
@@ -52,10 +52,10 @@ open class RequestBase : ServiceHelper {
     internal static func sendRequestForResponse(
         _ method: HTTPMethod,
         url: String,
-        params: Dictionary<String, AnyObject>? = nil,
+        params: [String: Any]? = nil,
         headers: [String: String]? = nil,
         encoding: ParameterEncoding = URLEncoding.default,
-        onResponse: @escaping (Bool, Error?) -> ()
+        onResponse: @escaping (Bool, RestError?) -> ()
         ) {
         manager.request(url, method: method, parameters: params, encoding: encoding, headers: headers)
             .validate()
@@ -68,18 +68,10 @@ open class RequestBase : ServiceHelper {
     
     internal static func getCollection(
         _ url: String,
-        params: [String : String]? = nil,
-        userName: String = UriBuilder.getCurrentUserName(),
-        password: String = UriBuilder.getCurrentPassword(),
-        completionHandler: @escaping (Array<RestObject>?, Error?) -> ()) {
-        let headers: [String: String]?
-        if userName.isEmpty || password.isEmpty {
-            headers = nil
-        } else {
-            let auth = "\(userName):\(password)" as NSString
-            headers = setBasicAuth(auth)
-        }
-        sendRequest(.get, url: url, params: params! as Dictionary<String, AnyObject>, headers: headers,
+        params: [String : Any]? = nil,
+        headers: [String: String]? = AuthManager.getAuthHeader(),
+        completionHandler: @escaping (Array<RestObject>?, RestError?) -> ()) {
+        sendRequest(.get, url: url, params: params, headers: headers,
                     onSuccess: { json in
                         getEntriesOnSuccess(json, completionHandler: completionHandler)
             },
@@ -88,15 +80,15 @@ open class RequestBase : ServiceHelper {
         })
     }
     
-    internal static func getEntriesOnSuccess(_ json: JSON, completionHandler: (Array<RestObject>?, Error?) -> ()) {
+    internal static func getEntriesOnSuccess(_ json: JSON, completionHandler: (Array<RestObject>?, RestError?) -> ()) {
         let dictionary = json.object as! Dictionary<String, AnyObject>
         let array = dictionary[ServiceConstants.ENTRIES] as? NSArray
         let objects = parseEntries(array)
         completionHandler(objects, nil)
     }
     
-    internal static func processFailureJson(_ json: JSON, completionHandler: (Array<RestObject>?, Error?) -> ()) {
-        let error = Error(json: json)
+    internal static func processFailureJson(_ json: JSON, completionHandler: (Array<RestObject>?, RestError?) -> ()) {
+        let error = RestError(json: json)
         completionHandler(nil, error)
     }
     
@@ -104,12 +96,10 @@ open class RequestBase : ServiceHelper {
 
     internal static func getSingle(
         _ url: String,
-        params: [String : String]? = nil,
-        userName: String = UriBuilder.getCurrentUserName(),
-        password: String = UriBuilder.getCurrentPassword(),
-        completionHandler: @escaping (RestObject?, Error?) -> ()) {
-        let auth = "\(userName):\(password)" as NSString
-        sendRequest(.get, url: url, params: params! as Dictionary<String, AnyObject>, headers: self.setBasicAuth(auth),
+        params: [String : Any]? = nil,
+        headers: [String: String]? = AuthManager.getAuthHeader(),
+        completionHandler: @escaping (RestObject?, RestError?) -> ()) {
+        sendRequest(.get, url: url, params: params, headers: headers,
                     onSuccess: { json in
                         getEntityOnSuccess(json, completionHandler: completionHandler)
             },
@@ -118,14 +108,14 @@ open class RequestBase : ServiceHelper {
         })
     }
 
-    internal static func getEntityOnSuccess(_ json: JSON, completionHandler: (RestObject?, Error?) -> ()) {
+    internal static func getEntityOnSuccess(_ json: JSON, completionHandler: (RestObject?, RestError?) -> ()) {
         let dictionary = json.object as! Dictionary<String, AnyObject>
         let object = parseSingle(dictionary as NSDictionary)
         completionHandler(object, nil)
     }
     
-    internal static func processFailureJson(_ json: JSON, completionHandler: (RestObject?, Error?) -> ()) {
-        let error = Error(json: json)
+    internal static func processFailureJson(_ json: JSON, completionHandler: (RestObject?, RestError?) -> ()) {
+        let error = RestError(json: json)
         completionHandler(nil, error)
     }
     
@@ -148,18 +138,18 @@ open class RequestBase : ServiceHelper {
     
     // MARK: - CRUD helper
     
-    internal static func noContentOnSuccess(_ completionHandler: (Bool, Error?) -> ()) {
+    internal static func noContentOnSuccess(_ completionHandler: (Bool, RestError?) -> ()) {
         completionHandler(true, nil)
     }
     
-    internal static func processNoContentFailure(_ json: JSON, completionHandler: (Bool, Error?) -> ()) {
-        let error = Error(json: json)
+    internal static func processNoContentFailure(_ json: JSON, completionHandler: (Bool, RestError?) -> ()) {
+        let error = RestError(json: json)
         completionHandler(false, error)
     }
     
     // MARK: - Properties Url helper
     
-    internal static func getRepositoriesUrlOnSuccess(_ json: JSON, completionHandler: (String?, Error?) -> ()) {
+    internal static func getRepositoriesUrlOnSuccess(_ json: JSON, completionHandler: (String?, RestError?) -> ()) {
         let resources = json["resources"].dictionary!
         let repositories = resources[LinkRel.repositories.rawValue]?.dictionary
         let url = repositories!["href"]?.stringValue
@@ -168,14 +158,14 @@ open class RequestBase : ServiceHelper {
         completionHandler(url, nil)
     }
     
-    internal static func processFailureJson(_ json: JSON, completionHandler: (String?, Error?) -> ()) {
-        let error = Error(json: json)
+    internal static func processFailureJson(_ json: JSON, completionHandler: (String?, RestError?) -> ()) {
+        let error = RestError(json: json)
         completionHandler(nil, error)
     }
     
     // MARK: - Batch helper
     
-    internal static func getBatchResponseOnSuccess(_ json: JSON, completionHandler: ([Bool], Error?) -> ()) {
+    internal static func getBatchResponseOnSuccess(_ json: JSON, completionHandler: ([Bool], RestError?) -> ()) {
         let dic = json.dictionaryObject
         var results: [Bool] = []
         if let response = dic {
@@ -196,8 +186,8 @@ open class RequestBase : ServiceHelper {
         completionHandler(results, nil)
     }
     
-    internal static func processFailureBatch(_ json: JSON, completionHandler: ([Bool], Error?) -> ()) {
-        let error = Error(json: json)
+    internal static func processFailureBatch(_ json: JSON, completionHandler: ([Bool], RestError?) -> ()) {
+        let error = RestError(json: json)
         completionHandler([], error)
     }
     

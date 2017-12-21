@@ -29,50 +29,6 @@ open class UriBuilder {
         self.context = context
     }
     
-    struct currentLoginCredential {
-        static var userName: String! = ""
-        static var password: String! = ""
-    }
-    
-    /**
-     Set login auth credential by username and password.
-     - parameter    userName:String      The user's name to log in.
-     - parameter    password:String      The password for user.
-     */
-    open static func setCurrentLoginCredential(_ userName: String, password: String) {
-        currentLoginCredential.userName = userName
-        currentLoginCredential.password = password
-    }
-    
-    /**
-     Clear up login auth credential.
-     */
-    open static func clearCurrentLoginCredential() {
-        currentLoginCredential.userName = ""
-        currentLoginCredential.password = ""
-    }
-    
-    /**
-     Get login auth string to generate basic auth header.
-     */
-    open static func getCurrentLoginAuthString() -> NSString {
-        return "\(currentLoginCredential.userName!):\(currentLoginCredential.password!)" as NSString
-    }
-    
-    /**
-     Get current login user name.
-     */
-    open static func getCurrentUserName() -> String {
-        return currentLoginCredential.userName
-    }
-    
-    /**
-     Get current login user password.
-     */
-    open static func getCurrentPassword() -> String {
-        return currentLoginCredential.password
-    }
-    
     /**
      Get root services url for Rest services.
      - returns:     url for services.

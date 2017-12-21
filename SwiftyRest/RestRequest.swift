@@ -15,8 +15,7 @@ open class RestRequest: RequestBase {
      Get raw json response for certain request.
      - parameter    method: String              The http method for rest service.
      - parameter    url:String                  The url to request.
-     - parameter    userName:String             User name of authentication.
-     - parameter    password:String             Password of authentication.
+     - parameter    headers:[String : String]   Headers along with this request.
      - parameter    params:[String : String]    Parameters along with this request.
      - parameter    completionHandler:(JSON?, Error?)->()
                     Handler after getting response.
@@ -26,16 +25,14 @@ open class RestRequest: RequestBase {
     open static func getRawJson(
         _ method: HttpMethod = .GET,
         url: String,
-        params: [String : String] = [:],
-        userName: String = UriBuilder.getCurrentUserName(),
-        password: String = UriBuilder.getCurrentPassword(),
-        completionHandler: @escaping (JSON?, Error?) -> ()) {
-        let auth = "\(userName):\(password)" as NSString
-        sendRequest(method.method(), url: url, params: params as Dictionary<String, AnyObject>, headers: setBasicAuth(auth),
+        params: [String : Any]? = nil,
+        headers: [String: String]? = AuthManager.getAuthHeader(),
+        completionHandler: @escaping (JSON?, RestError?) -> ()) {
+        sendRequest(method.method(), url: url, params: params, headers: headers,
             onSuccess: { json in
                 completionHandler(json, nil)
             }, onFailure: { json in
-                let error = Error(json: json)
+                let error = RestError(json: json)
                 completionHandler(nil, error)
             }
         )
@@ -46,8 +43,7 @@ open class RestRequest: RequestBase {
     /**
      Get Rest collection response with parameters and authentication.
      - parameter    url:String                  The url to request.
-     - parameter    userName:String             User name of authentication.
-     - parameter    password:String             Password of authentication.
+     - parameter    headers:[String : String]   Headers along with this request.
      - parameter    params:[String : String]    Parameters along with this request.
      - parameter    completionHandler:(NSArray?, Error?)->()
                     Handler after getting response.
@@ -55,11 +51,11 @@ open class RestRequest: RequestBase {
                     Otherwise, NSArray will be nil.
      */
     open static func getRestObjectCollection(
-        _ url: String, params: [String : String],
-        userName: String = UriBuilder.getCurrentUserName(),
-        password: String = UriBuilder.getCurrentPassword(),
-        completionHandler: @escaping (Array<RestObject>?, Error?) -> ()) {
-        getCollection(url, params: params, userName: userName, password: password, completionHandler: completionHandler)
+        _ url: String,
+        params: [String : Any]? = nil,
+        headers: [String: String]? = AuthManager.getAuthHeader(),
+        completionHandler: @escaping (Array<RestObject>?, RestError?) -> ()) {
+        getCollection(url, params: params, headers: headers, completionHandler: completionHandler)
     }
     
     // MARK: - Get Single Object
@@ -68,8 +64,7 @@ open class RestRequest: RequestBase {
      Get single Rest object with parameters and authentication.
      - parameter    url:String                  The url to request.
      - parameter    params:[String : String]    Parameters along with this request.
-     - parameter    userName:String             User name of authentication.
-     - parameter    password:String             Password of authentication.
+     - parameter    headers:[String : String]   Headers along with this request.
      - parameter    completionHandler:(NSDictionary?, Error?)->()
      Handler after getting response.
      If success, Error will be nil. NSDictionary stores information for objec.
@@ -77,11 +72,10 @@ open class RestRequest: RequestBase {
      */
     open static func getRestObject(
         _ url: String,
-        params: [String : String]? = nil,
-        userName: String = UriBuilder.getCurrentUserName(),
-        password: String = UriBuilder.getCurrentPassword(),
-        completionHandler: @escaping (RestObject?, Error?) -> ()) {
-        getSingle(url, params: params, userName: userName, password: password, completionHandler: completionHandler)
+        params: [String : Any]? = nil,
+        headers: [String: String]? = AuthManager.getAuthHeader(),
+        completionHandler: @escaping (RestObject?, RestError?) -> ()) {
+        getSingle(url, params: params, headers: headers, completionHandler: completionHandler)
     }
     
     // MARK: - CRUD control requests
@@ -90,8 +84,7 @@ open class RestRequest: RequestBase {
      Delete an object with parameters and authentication.
      - parameter    url:String                  The url to request.
      - parameter    params:[String : String]    Parameters along with this request.
-     - parameter    userName:String             User name of authentication.
-     - parameter    password:String             Password of authentication.
+     - parameter    headers:[String : String]   Headers along with this request.
      - parameter    completionHandler:(NSDictionary?, Error?)->()
                     Handler after getting response.
                     If success, Error will be nil. NSDictionary is response of request.
@@ -99,12 +92,10 @@ open class RestRequest: RequestBase {
      */
     open static func deleteWithAuth(
         _ url: String,
-        params: [String : String]? = nil,
-        userName: String = UriBuilder.getCurrentUserName(),
-        password: String = UriBuilder.getCurrentPassword(),
-        completionHandler: @escaping (Bool, Error?) -> ()) {
-        let auth = "\(userName):\(password)" as NSString
-        sendRequest(.delete, url: url, headers: self.setBasicAuth(auth),
+        params: [String : Any]? = nil,
+        headers: [String: String]? = AuthManager.getAuthHeader(),
+        completionHandler: @escaping (Bool, RestError?) -> ()) {
+        sendRequest(.delete, url: url, headers: headers,
                     onSuccess: { json in
                         noContentOnSuccess(completionHandler)
             },
@@ -117,8 +108,7 @@ open class RestRequest: RequestBase {
      Update an object using POST by request body with parameters and authentication.
      - parameter    url:String                  The url to request.
      - parameter    requestBody:Dictionary<String, AnyObject>    RequestBody to update object.
-     - parameter    userName:String             User name of authentication.
-     - parameter    password:String             Password of authentication.
+     - parameter    headers:[String : String]   Headers along with this request.
      - parameter    completionHandler:(NSDictionary?, Error?)->()
                     Handler after getting response.
                     If success, Error will be nil. NSDictionary is response of request.
@@ -126,12 +116,10 @@ open class RestRequest: RequestBase {
      */
     open static func updateWithAuth(
         _ url: String,
-        requestBody: Dictionary<String, AnyObject>,
-        userName: String = UriBuilder.getCurrentUserName(),
-        password: String = UriBuilder.getCurrentPassword(),
-        completionHandler: @escaping (RestObject?, Error?) -> ()) {
-        let auth = "\(userName):\(password)" as NSString
-        sendRequest(.post, url: url, params: requestBody, headers: getPostRequestHeaders(auth), encoding: JSONEncoding.default,
+        requestBody: [String: Any]? = nil,
+        headers: [String: String]? = AuthManager.getAuthHeader(),
+        completionHandler: @escaping (RestObject?, RestError?) -> ()) {
+        sendRequest(.post, url: url, params: requestBody, headers: getPostRequestHeaders(), encoding: JSONEncoding.default,
                     onSuccess:{ json in
                         getEntityOnSuccess(json,  completionHandler: completionHandler)
             },
@@ -143,8 +131,7 @@ open class RestRequest: RequestBase {
     /**
      Update an object using PUT with parameters and authentication.
      - parameter    url:String                  The url to request.
-     - parameter    userName:String             User name of authentication.
-     - parameter    password:String             Password of authentication.
+     - parameter    headers:[String : String]   Headers along with this request.
      - parameter    completionHandler:(NSDictionary?, Error?)->()
                     Handler after getting response.
                     If success, Error will be nil. NSDictionary is response of request.
@@ -152,12 +139,10 @@ open class RestRequest: RequestBase {
      */
     open static func updateWithAuthByPut(
         _ url: String,
-        userName: String = UriBuilder.getCurrentUserName(),
-        password: String = UriBuilder.getCurrentPassword(),
-        completionHandler: @escaping (RestObject?, Error?) -> ()
+        headers: [String: String]? = AuthManager.getAuthHeader(),
+        completionHandler: @escaping (RestObject?, RestError?) -> ()
         ) {
-        let auth = "\(userName):\(password)" as NSString
-        sendRequest(.put, url: url, headers: getPostRequestHeaders(auth), encoding: JSONEncoding.default,
+        sendRequest(.put, url: url, headers: getPostRequestHeaders(), encoding: JSONEncoding.default,
                     onSuccess:{ json in
                         getEntityOnSuccess(json,  completionHandler: completionHandler)
             },
@@ -170,8 +155,7 @@ open class RestRequest: RequestBase {
      Create an object by request body with parameters and authentication.
      - parameter    url:String                  The url to request.
      - parameter    requestBody:Dictionary<String, AnyObject>    RequestBody to create object.
-     - parameter    userName:String             User name of authentication.
-     - parameter    password:String             Password of authentication.
+     - parameter    headers:[String : String]   Headers along with this request.
      - parameter    completionHandler:(NSDictionary?, Error?)->()
                     Handler after getting response.
                     If success, Error will be nil. NSDictionary contains information of created object.
@@ -179,11 +163,10 @@ open class RestRequest: RequestBase {
      */
     open static func createWithAuth(
         _ url: String,
-        requestBody: Dictionary<String, AnyObject>,
-        userName: String = UriBuilder.getCurrentUserName(),
-        password: String = UriBuilder.getCurrentPassword(),
-        completionHandler: @escaping (RestObject?, Error?) -> ()) {
-        sendRequest(.post, url: url, params: requestBody, headers: self.getPostRequestHeaders(), encoding: JSONEncoding.default,
+        requestBody: [String: Any],
+        headers: [String: String]? = AuthManager.getAuthHeader(),
+        completionHandler: @escaping (RestObject?, RestError?) -> ()) {
+        sendRequest(.post, url: url, params: requestBody, headers: getPostRequestHeaders(), encoding: JSONEncoding.default,
                     onSuccess: { json in
                         getEntityOnSuccess(json, completionHandler: completionHandler)
             },
@@ -201,7 +184,10 @@ open class RestRequest: RequestBase {
                     If success, Error will be nil. String is repositories url for REST service.
                     Otherwise, String will be nil.
      */
-    open static func getRepositoriesUrl(_ rootUrl: String, serviceContext: String, completionHandler: @escaping (String?, Error?) -> ()) {
+    open static func getRepositoriesUrl(
+        _ rootUrl: String,
+        serviceContext: String,
+        completionHandler: @escaping (String?, RestError?) -> ()) {
         let uriBuilder = UriBuilder(rootUrl: rootUrl, context: serviceContext)
         sendRequest(.get, url: uriBuilder.getServicesUrl(),
                     onSuccess: { json in
@@ -220,7 +206,7 @@ open class RestRequest: RequestBase {
                     If success, Error will be nil. NSDictionary is properties of product info.
                     Otherwise, NSDictionary will be nil.
      */
-    open static func getProductInfo(_ rootUrl: String, context: String, completionHandler: @escaping (NSDictionary?, Error?) -> ()){
+    open static func getProductInfo(_ rootUrl: String, context: String, completionHandler: @escaping (NSDictionary?, RestError?) -> ()){
         if UriBuilder.productInfoUrl.isEmpty {
             let uriBuilder = UriBuilder(rootUrl: rootUrl, context: context)
             UriBuilder.productInfoUrl = uriBuilder.getProductInfo()
@@ -239,8 +225,7 @@ open class RestRequest: RequestBase {
     /**
      Upload a content file for certain object.
      - parameter    url:String                  The url to request.
-     - parameter    userName:String             User name of authentication.
-     - parameter    password:String             Password of authentication.
+     - parameter    headers:[String : String]   Headers along with this request.
      - parameter    metadata:JSON               Meta data for object content in JSON format.
      - parameter    file:NSData                 Content file in NSData format.
      - parameter    type:String                 MIME type for this content file.
@@ -251,16 +236,12 @@ open class RestRequest: RequestBase {
      */
     open static func uploadFile(
         _ url: String,
-        userName: String = UriBuilder.getCurrentUserName(),
-        password: String = UriBuilder.getCurrentPassword(),
+        headers: [String: String]? = AuthManager.getAuthHeader(),
         metadata: JSON,
         file: Data,
         type: String,
-        completionHandler: @escaping (NSDictionary?, Error?) -> ()
+        completionHandler: @escaping (NSDictionary?, RestError?) -> ()
         ) {
-        let auth = "\(userName):\(password)" as NSString
-        
-        
         Alamofire.upload(
             multipartFormData: { (multipart) in
                 multipart.append(self.getNSDataFromJSON(metadata), withName: "metadata", mimeType: ServiceConstants.MIME_JSON)
@@ -268,7 +249,7 @@ open class RestRequest: RequestBase {
             },
             usingThreshold: UInt64.init(),
             to: url, method: .post,
-            headers: ServiceHelper.getUploadRequestHeaders(auth),
+            headers: getUploadRequestHeaders(),
             encodingCompletion: { encodingResult in
                 switch encodingResult {
                 case .success(let upload, _, _):
@@ -283,7 +264,7 @@ open class RestRequest: RequestBase {
                         case .failure:
                             let json = try! JSON(data: response.data!)
                             printError("error: \(json)")
-                            completionHandler(nil, Error(json: json))
+                            completionHandler(nil, RestError(json: json))
                         }
                     }
                 case .failure(let encodingError):
@@ -327,8 +308,7 @@ open class RestRequest: RequestBase {
     /**
      Download from url for content of object.
      - parameter    url:String                  The url to request.
-     - parameter    userName:String             User name of authentication.
-     - parameter    password:String             Password of authentication.
+     - parameter    headers:[String : String]   Headers along with this request.
      - parameter    objectId:String             The object id for object of this content to identify it.
      - parameter    completionHandler:(NSData?, Error?)->()
                     Handler after getting response.
@@ -337,18 +317,14 @@ open class RestRequest: RequestBase {
      */
     open static func downloadFile(
         _ url: String,
-        userName: String = UriBuilder.getCurrentUserName(),
-        password: String = UriBuilder.getCurrentPassword(),
         objectId: String,
-        completionHandler: @escaping (Data?, Error?) -> ()
+        completionHandler: @escaping (Data?, RestError?) -> ()
         ) {
-        let auth = "\(userName):\(password)" as NSString
-    
         let destination: DownloadRequest.DownloadFileDestination = {_, _ in
             let fileUrl = FileUtility.getSaveToUrl(objectId)
             return (fileUrl, [.removePreviousFile, .createIntermediateDirectories])
         }
-        Alamofire.download(url, method: .get, headers: ServiceHelper.getDownloadRequestHeaders(auth), to: destination)
+        Alamofire.download(url, method: .get, headers: getDownloadRequestHeaders(), to: destination)
             .response { response in
                 debugPrint(response)
         }
@@ -359,8 +335,7 @@ open class RestRequest: RequestBase {
      Move an object by request body with parameters and authentication.
      - parameter    url:String                  The url to request.
      - parameter    requestBody:Dictionary<String, AnyObject>    RequestBody to create object.
-     - parameter    userName:String             User name of authentication.
-     - parameter    password:String             Password of authentication.
+     - parameter    headers:[String : String]   Headers along with this request.
      - parameter    completionHandler:(NSDictionary?, Error?)->()
                     Handler after getting response.
                     If success, Error will be nil. NSDictionary contains information of moved object.
@@ -369,11 +344,9 @@ open class RestRequest: RequestBase {
     open static func moveObject(
         _ url: String,
         requestBody: Dictionary<String, AnyObject>,
-        userName: String = UriBuilder.getCurrentUserName(),
-        password: String = UriBuilder.getCurrentPassword(),
-        completionHandler: @escaping (RestObject?, Error?) -> ()) {
-        let auth = "\(userName):\(password)" as NSString
-        sendRequest(.put, url: url, params: requestBody, headers: self.getPostRequestHeaders(auth), encoding: JSONEncoding.default,
+        headers: [String: String]? = AuthManager.getAuthHeader(),
+        completionHandler: @escaping (RestObject?, RestError?) -> ()) {
+        sendRequest(.put, url: url, params: requestBody, headers: getPostRequestHeaders(), encoding: JSONEncoding.default,
                     onSuccess: { json in
                          getEntityOnSuccess(json, completionHandler: completionHandler)
                         },
@@ -387,8 +360,7 @@ open class RestRequest: RequestBase {
     /**
      Add membership for a Group.
      - parameter    url:String                  The url to request.
-     - parameter    userName:String             User name of authentication.
-     - parameter    password:String             Password of authentication.
+     - parameter    headers:[String : String]   Headers along with this request.
      - parameter    requestBody:Dictionary<String, AnyObject>    RequestBody to add membership.
      - parameter    completionHandler:(Bool, Error?)->()
                     Handler after getting response.
@@ -397,12 +369,10 @@ open class RestRequest: RequestBase {
      */
     open static func addMembership(
         _ url: String,
-        userName: String = UriBuilder.getCurrentUserName(),
-        password: String = UriBuilder.getCurrentPassword(),
+        headers: [String: String]? = AuthManager.getAuthHeader(),
         requestBody: Dictionary<String, AnyObject>,
-        completionHandler: @escaping (Bool, Error?) -> ()) {
-        let auth = "\(userName):\(password)" as NSString
-        sendRequestForResponse(.post, url: url, params: requestBody, headers: ServiceHelper.getPostRequestHeaders(auth), encoding: JSONEncoding.default, onResponse: completionHandler)
+        completionHandler: @escaping (Bool, RestError?) -> ()) {
+        sendRequestForResponse(.post, url: url, params: requestBody, headers: getPostRequestHeaders(), encoding: JSONEncoding.default, onResponse: completionHandler)
     }
     
     // MARK: - Batch requests
@@ -410,8 +380,7 @@ open class RestRequest: RequestBase {
     /**
      Post a batch request to batch url.
      - parameter    batchUrl:String             The url of batch relation.
-     - parameter    userName:String             User name of authentication.
-     - parameter    password:String             Password of authentication.
+     - parameter    headers:[String : String]   Headers along with this request.
      - parameter    requestBody:Dictionary<String, AnyObject>    RequestBody for this batch request.
      - parameter    completionHandler:([Bool], Error?)->()
                     Handler after getting response.
@@ -420,11 +389,10 @@ open class RestRequest: RequestBase {
      */
     open static func batchRequest(
         _ batchUrl: String,
-        userName: String = UriBuilder.getCurrentUserName(),
-        password: String = UriBuilder.getCurrentPassword(),
+        headers: [String: String]? = AuthManager.getAuthHeader(),
         requestBody: Dictionary<String, AnyObject>,
-        completionHandler: @escaping ([Bool], Error?) -> ()) {
-        sendRequest(.post, url: batchUrl, params: requestBody, headers: self.getPostRequestHeaders(), encoding: JSONEncoding.default,
+        completionHandler: @escaping ([Bool], RestError?) -> ()) {
+        sendRequest(.post, url: batchUrl, params: requestBody, headers: getPostRequestHeaders(), encoding: JSONEncoding.default,
                     onSuccess: { json in
                         getBatchResponseOnSuccess(json, completionHandler: completionHandler)
             },
@@ -439,8 +407,7 @@ open class RestRequest: RequestBase {
     /**
      Add membership for a Group.
      - parameter    searchUrl:String            The search url w/o template.
-     - parameter    userName:String             User name of authentication.
-     - parameter    password:String             Password of authentication.
+     - parameter    headers:[String : String]   Headers along with this request.
      - parameter    location:String             The location in folder path format to search from.
      - parameter    keyword:String              The keyword to search for.
      - parameter    inline:Bool                 To search with inline or not.
@@ -452,13 +419,12 @@ open class RestRequest: RequestBase {
      */
     open static func fullTextSearch(
         _ searchUrl: String,
-        userName: String = UriBuilder.getCurrentUserName(),
-        password: String = UriBuilder.getCurrentPassword(),
+        headers: [String: String]? = AuthManager.getAuthHeader(),
         location: String? = nil,
         keyword: String,
         inline: Bool = false,
         otherParams: [String: String]? = nil,
-        completionHandler: @escaping (Array<RestObject>?, Error?) -> ()
+        completionHandler: @escaping (Array<RestObject>?, RestError?) -> ()
         ) {
         let url = searchUrl.split(separator: "{").map(String.init)[0]
         var params = ["q": keyword, "inline": String(inline)] as [String: String]
@@ -470,6 +436,24 @@ open class RestRequest: RequestBase {
                 params[param.0] = param.1
             }
         }
-        getCollection(url, params: params, userName: userName, password: password, completionHandler: completionHandler)
+        getCollection(url, params: params, headers: headers, completionHandler: completionHandler)
+    }
+    
+    /**
+     Exchange OAuth2 code for access token
+    */
+    open static func exchangeCodeToToken(
+        _ method: HttpMethod = .POST,
+        url: String,
+        code: String,
+        completionHandler: @escaping (JSON?, RestError?) -> ()) {
+        sendRequest(method.method(), url: url, params: ["code": code], headers: ["Content-Type": "application/x-www-form-urlencoded"],
+                    onSuccess: { json in
+                        completionHandler(json, nil)
+                    }, onFailure: { json in
+                        let error = RestError(json: json)
+                        completionHandler(nil, error)
+                    }
+        )
     }
 }

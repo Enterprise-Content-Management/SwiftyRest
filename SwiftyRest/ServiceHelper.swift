@@ -9,31 +9,23 @@
 import Alamofire
 
 open class ServiceHelper {
+    
     // MARK: - Util
     
-    static func setBasicAuth(_ plainString: NSString = UriBuilder.getCurrentLoginAuthString()) -> [String : String] {
-        let plainData = plainString.data(using: String.Encoding.utf8.rawValue)
-        let base64String = plainData?.base64EncodedString(options: NSData.Base64EncodingOptions(rawValue: 0))
-        Alamofire.SessionManager.default.session.configuration.httpAdditionalHeaders = [
-            "Authorization": "Basic " + base64String!
-        ]
-        return ["Authorization": "Basic " + base64String!]
-    }
-    
-    static func getPostRequestHeaders(_ plainString: NSString = UriBuilder.getCurrentLoginAuthString()) -> [String: String] {
-        var headers = self.setBasicAuth(plainString)
+    static func getPostRequestHeaders() -> [String: String] {
+        var headers = AuthManager.getAuthHeader()
         headers["Content-Type"] = ServiceConstants.MIME_JSON
         return headers
     }
     
-    static func getUploadRequestHeaders(_ plainString: NSString = UriBuilder.getCurrentLoginAuthString()) -> [String: String] {
-        var headers = self.setBasicAuth(plainString)
+    static func getUploadRequestHeaders() -> [String: String] {
+        var headers = AuthManager.getAuthHeader()
         headers["Content-Type"] = ServiceConstants.MIME_MULTIPART
         return headers
     }
     
-    static func getDownloadRequestHeaders(_ plainString: NSString = UriBuilder.getCurrentLoginAuthString()) -> [String: String] {
-        let headers = self.setBasicAuth(plainString)
+    static func getDownloadRequestHeaders() -> [String: String] {
+        let headers = AuthManager.getAuthHeader()
         return headers
     }
 
