@@ -2,6 +2,7 @@ SwiftyRest / Documentum REST iOS Framework in Swift
 =========
 [![License: Apache 2](https://img.shields.io/badge/license-Apache%202.0-brightgreen.svg)](http://www.apache.org/licenses/LICENSE-2.0)
 
+<<<<<<< Updated upstream
 This ios framework contains a series of API of Documentum REST Services written in Swift code. The purpose of this project is to simplify users' efforts on developing an iOS client to cooperate with Documentum REST Services. It does NOT indicate that uses could not develop a customized framework using other technologies.
 
 Opentext shares the source code of this project for the technology sharing. If users plan to migrate the sample codes to their
@@ -44,3 +45,10 @@ Run below command to install `CocoaPods`.
 6. Find **SwiftyRest.framework** from **Build** folder of the project.
 
 7. Add the framework file to your project by menu **Files** -> **Add files to _YOU_PROJECT_NAME_**
+=======
+You can add this framework as customized framework by
+* Build this project
+* Find SwiftyRest.framework from 'Build' folder.
+* Add it from menu 'Files' -> 'Add files to YOU_PROJECT_NAME'
+
+>>>>>>> Stashed changes
