@@ -27,8 +27,9 @@ open class RestRequest: RequestBase {
         url: String,
         params: [String : Any]? = nil,
         headers: [String: String]? = AuthManager.getAuthHeader(),
+        encoding: ParameterEncoding = URLEncoding.default,
         completionHandler: @escaping (JSON?, RestError?) -> ()) {
-        sendRequest(method.method(), url: url, params: params, headers: headers,
+        sendRequest(method.method(), url: url, params: params, headers: headers, encoding: encoding,
             onSuccess: { json in
                 completionHandler(json, nil)
             }, onFailure: { json in
